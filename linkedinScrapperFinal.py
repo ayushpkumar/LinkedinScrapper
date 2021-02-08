@@ -22,7 +22,7 @@ global driver
 data=pandas.DataFrame(columns=['Name','Email'])
 names = []
 emails = []
-def writeCSV(data, path):
+def writeCSV(data, path, logger):
     # infoLog("######## "+ data)
     # infoLog("######## ######## " + str(type(data)))
     output_file_name="LinkedinScraped.xlsx"
@@ -33,7 +33,7 @@ def writeCSV(data, path):
         data.to_excel(writer, sheet_name='Data')
         writer.save() 
         #infoLog(data)
-    infoLog("Excel file with " + output_file_name + " Created !!")
+    infoLog("Excel file with " + output_file_name + " Created !!", logger)
         
                       
 def getElement(sel, logger):
@@ -109,15 +109,15 @@ def getLinkURL(i,driver,search,logger):
     
     
 def infoLog(mssg, logger):
-    print(mssg)
+    #print(mssg)
     logger.info(mssg)
     
 def debugLog(message):
-    print(message)
+    #print(message)
     logging.debug(message)
 
 def criticalLog(msg, logger):
-    print(msg)
+    #print(msg)
     logger.critical(msg, logger)
 
     
@@ -169,13 +169,18 @@ def main():
     #logger.info('This is a warning')
     #logger.error('This is an error')
     
-    logging.basicConfig(filename = output_file_name, filemode='w', format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level='DEBUG')
+    output_file_name_1="LOGGER_Scraper_.log"
+    output_file_name_split = output_file_name_1.split('.')
+    output_file_name_1 = "".join(output_file_name_split[0:-1]) + "_" + str(int(time.time())) + "." + \
+                       output_file_name_split[-1]
+    
+    logging.basicConfig(filename = output_file_name_1, filemode='w', format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level='INFO')
     infoLog('Path for log file' + p, logger)    
     #logging.basicConfig(filename= path + '/LOG/' + output_file_name, filemode='w', format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
     #logging.warning('This will get logged to a file')
     infoLog("####  Starting the Program   ####", logger)
     infoLog("#### Linkedin Scrapping Tool ####", logger)
-    infoLog("####              Ayush      ####",  logger)
+    infoLog("####          Ayush	   ####",  logger)
     infoLog("####  ayushpkumar@gmail.com  ####",  logger)
     infoLog("####       v-1.0.0           ####", logger)
     usrname= input('Enter Linkedin User Name  : ')
@@ -189,18 +194,21 @@ def main():
     if opVar == "True":
         options.headless = True
     
-    infoLog('#### Linkedin Scrapper Started  ####', logger)
+    infoLog('## Linkedin Scrapper Started  ##', logger)
     
     infoLog('#Username : ' + usrname, logger)
     
-    driver = webdriver.Chrome('/home/ayush/Desktop/Guardhat/scripts/chromedriver', chrome_options=options)
+    chromepath= path + '/chromedriver'
+    print(chromepath)
+    
+    driver = webdriver.Chrome('/home/ayush/Desktop/Guardhat/scripts/chromedriver' , chrome_options=options)
     
     #options= Options()
     #options.headless = True
     # driver = webdriver.Chrome('/home/ayush/Desktop/Guardhat/scripts/chromedriver')
     
     driver.get('https://www.linkedin.com')
-    
+    infoLog('#### Attempting Linkedin Login  ####', logger)
     username = driver.find_element_by_id('session_key')
     # username.send_keys(parameters.linkedin_username)
     username.send_keys(usrname)
@@ -214,7 +222,7 @@ def main():
     sign_in_button = driver.find_element_by_xpath('//*[@type="submit"]')
     sign_in_button.click()
     sleep(10)
-    
+    infoLog('#### Linkedin Login Succesfull  ####', logger)
     x = 0
     #linkedin_urls=["https://www.linkedin.com/in/ayushpkumar", 'https://linkedin.com/in/mikhailzhavoronkov']
     while len(linkedin_urls) < int(noSearch):
